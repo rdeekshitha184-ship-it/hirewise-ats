@@ -1,0 +1,230 @@
+<head>
+  <style>
+    .strong { color: green; font-weight: bold; }
+    .partial { color: orange; font-weight: bold; }
+    .low { color: red; font-weight: bold; }
+  </style>
+</head>
+
+<h2>📄 Resume Dashboard</h2>
+<!-- <h3>Average ATS Score: {{ average_score }}%</h3> -->
+<hr>
+<form method="get">
+    <textarea
+        name="jd"
+        rows="4"
+        cols="60"
+        placeholder="Paste Job Description here..."
+    >{{ request.GET.jd }}</textarea>
+    <br><br>
+    <label> Minimum Score Filter:</label> 
+    <input type="number" name="min_score" placeholder="Min score %" value="{{ request.GET.min_score|default:0 }}">
+    <button type="submit">Analyze Job Description</button>
+    <a href="{% url 'export_csv' %}">
+  <button type="button">Export ATS Results</button>
+     </a>
+</form>
+
+<hr>
+<form method="get">
+    <input type="text" name="skill" placeholder="Filter by skill" value="{{ skill }}">
+    <button type="submit">Search</button>
+</form>
+
+<!-- <p>
+    
+  Total Resumes: {{ resumes|length }} |
+  Average Score: {{ average_score }}%
+
+</p>-->
+
+<hr>
+<!-- {% if search_skills %} 
+<p>
+  <strong>Extracted Job Skills:</strong>
+  {{ search_skills|join:", " }}
+</p>
+{% endif %}-->
+
+<!--{% for resume in resumes %}
+    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+        <h4>Rank: {{ resume.rank }}</h4>
+
+        {% if resume.rank == 1 %}
+           <span style="color: gold; font-weight: bold;">🏆 Best Match</span>
+{% endif %}
+        <h3>{{ resume.candidate_name }}</h3>
+        <p><b>Email:</b> {{ resume.email }}</p>
+        <p><b>Matched Skills:</b>
+  {% for skill in resume.matched_skills %}
+    <span style="background:#d4edda;color:#155724;padding:4px 8px;
+                 border-radius:12px;margin-right:5px;font-size:12px;">
+      {{ skill }}
+    </span>
+  {% empty %}
+    <span style="color:#999;">None</span>
+  {% endfor %}
+</p>
+
+<p><b>Missing Skills:</b>
+  {% for skill in resume.missing_skills %}
+    <span style="background:#f8d7da;color:#721c24;padding:4px 8px;
+                 border-radius:12px;margin-right:5px;font-size:12px;">
+      {{ skill }}
+    </span>
+  {% empty %}
+    <span style="color:#999;">None</span>
+  {% endfor %}
+</p>
+        <p><b>Experience:</b> {{ resume.experience_years }} years</p>
+        <p>
+           <strong>Score:</strong> {{ resume.score }}
+
+            {% if resume.score >= 70 %}
+          <span style="color: green; font-weight: bold;">(High Match)</span>
+            {% elif resume.score >= 40 %}
+          <span style="color: orange; font-weight: bold;">(Medium Match)</span>
+            {% else %}
+           <span style="color: red; font-weight: bold;">(Low Match)</span>
+          {% endif %}
+       </p>
+       <p>
+      <strong>Reason:</strong> {{ resume.match_reason }}
+       </p>
+       <p><strong>Matched Skills:</strong>
+    {% if resume.matched_skills %}
+        {{ resume.matched_skills|join:", " }}
+    {% else %}
+        None
+    {% endif %}
+</p>
+
+<p><strong>Missing Skills:</strong>
+    {% if resume.missing_skills %}
+        {{ resume.missing_skills|join:", " }}
+    {% else %}
+        None
+    {% endif %}
+</p>
+{% if resume.missing_skills %}
+<p>
+  <strong>Skill Gap:</strong>
+  Candidate should improve
+  <span style="color:red;">
+    {{ resume.missing_skills|join:", " }}
+  </span>
+  to match this role.
+</p>
+{% endif %}
+    </div>
+{% empty %}
+    <p>No resumes found.</p>
+{% endfor %}-->
+{% for item in results %}
+  <div style="
+  border:1px solid #ddd;
+  padding:16px;
+  margin:15px 0;
+  border-radius:10px;
+  box-shadow:0 4px 8px rgba(0,0,0,0.05);
+  background:#fff;
+">
+
+    <h3>{{ item.resume.candidate_name }}</h3>
+    {% if item.rank %}
+  <span style="
+    display:inline-block;
+    background:#e6f4ea;
+    color:#137333;
+    padding:6px 12px;
+    border-radius:20px;
+    font-weight:bold;
+    margin-bottom:8px;
+  ">
+    {{ item.rank }}
+  </span>
+     {% endif %}
+    <p><b>Email:</b> {{ item.resume.email }}</p>
+    <p><b>Experience:</b> {{ item.resume.experience_years }} years</p>
+
+    <p><b>Matched Skills:</b>
+      {% if item.matched_skills %}
+        {{ item.matched_skills|join:", " }}
+      {% else %}
+        <span style="color:#999;">None</span>
+      {% endif %}
+    </p>
+
+    <p><b>Missing Skills:</b>
+      {% if item.missing_skills %}
+        {{ item.missing_skills|join:", " }}
+      {% else %}
+        <span style="color:#999;">None</span>
+      {% endif %}
+    </p>
+
+    {% if item.suggestions %}
+  <p><strong>Recommendations:</strong></p>
+  <ul>
+    {% for tip in item.suggestions %}
+      <li>{{ tip }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+    <p><strong>ATS Score:</strong> {{ item.score }}%</p>
+    
+
+<div style="background:#eee; border-radius:10px; height:18px; width:100%;">
+  <div style="
+      height:18px;
+      border-radius:10px;
+      width: {{ item.score }}%;
+      background:
+        {% if item.score >= 70 %}
+          #28a745
+        {% elif item.score >= 40 %}
+          #ffc107
+        {% else %}
+          #dc3545
+        {% endif %}
+    ">
+  </div>
+</div>
+
+<p style="margin-top:6px; font-weight:bold;">
+  {{ item.match_reason }}
+</p>
+
+    {% if item.missing_skills %}
+      <p>
+        <strong>Skill Gap:</strong>
+        Candidate should improve
+        <span style="color:red;">
+          {{ item.missing_skills|join:", " }}
+        </span>
+      </p>
+    {% endif %}
+
+  </div>
+  <form method="post" 
+      action="{% url 'delete_resume' item.resume.id %}"
+      onsubmit="return confirm('Delete this resume permanently?');"
+      style="margin-top:10px;">
+      
+    {% csrf_token %}
+    <button style="
+        background-color:#ff4d4d;
+        color:white;
+        padding:6px 12px;
+        border:none;
+        border-radius:15px;
+        cursor:pointer;
+        font-size:12px;
+    ">
+        🗑️ Delete Resume
+    </button>
+</form>
+{% empty %}
+  <p>No resumes found.</p>
+{% endfor %}

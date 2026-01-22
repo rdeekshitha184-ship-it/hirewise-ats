@@ -1,0 +1,15 @@
+<h2>Upload Resume</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <input type="text" name="candidate_name" placeholder="Candidate Name" required><br><br>
+
+    <input type="email" name="email" placeholder="Email" required><br><br>
+
+    <input type="number" name="experience_years" placeholder="Experience (years)" required><br><br>
+
+    <input type="file" name="resume" accept=".pdf" required><br><br>
+
+    <button type="submit">Upload Resume</button>
+</form>
