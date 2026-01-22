@@ -53,8 +53,4 @@ The application allows **uploading, analyzing, viewing, and deleting resumes ind
 
 ---
 
-## 📸 Screenshots
 
-> _Screenshots can be added after deployment_
-
-Example:
